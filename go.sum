@@ -835,6 +835,8 @@ github.com/matttproud/golang_protobuf_extensions v1.0.1/go.mod h1:D8He9yQNgCq6Z5
 github.com/matttproud/golang_protobuf_extensions v1.0.2-0.20181231171920-c182affec369 h1:I0XW9+e1XWDxdcEniV4rQAIOPUGDq67JSCiRCgGCZLI=
 github.com/matttproud/golang_protobuf_extensions v1.0.2-0.20181231171920-c182affec369/go.mod h1:BSXmuO+STAnVfrANrmjBb36TMTDstsz7MSK+HVaYKv4=
 github.com/maxbrunsfeld/counterfeiter/v6 v6.2.2/go.mod h1:eD9eIE7cdwcMi9rYluz88Jz2VyhSmden33/aXg4oVIY=
+github.com/mflendrich/pkg v0.0.0-20200818133434-fa27c4a25760 h1:jBY7WLac7drq1DrYkxBGhGU9ZqQQxguWtvgL7jUF0s0=
+github.com/mflendrich/pkg v0.0.0-20200818133434-fa27c4a25760/go.mod h1:PQk0BoN9nnv5rHBxzNb12vNGGhGngZKqkHVtAPOpx2g=
 github.com/mgutz/ansi v0.0.0-20170206155736-9520e82c474b/go.mod h1:01TrycV0kFyexm33Z7vhZRXopbI8J3TDReVlkTgMUxE=
 github.com/mholt/archiver/v3 v3.3.0/go.mod h1:YnQtqsp+94Rwd0D/rk5cnLrxusUBUXg+08Ebtr1Mqao=
 github.com/miekg/dns v1.0.14/go.mod h1:W1PPwlIAgtquWBMBEV9nkV9Cazfe8ScdGz/Lj7v3Nrg=
@@ -1767,6 +1769,7 @@ k8s.io/apiextensions-apiserver v0.17.2/go.mod h1:4KdMpjkEjjDI2pPfBA15OscyNldHWdB
 k8s.io/apiextensions-apiserver v0.17.6 h1:o5JWDya65ApIVez+RfR40PGrqjPUZHhlSmwAHCvL20E=
 k8s.io/apiextensions-apiserver v0.17.6/go.mod h1:Z3CHLP3Tha+Rbav7JR3S+ye427UaJkHBomK2c4XtZ3A=
 k8s.io/apiextensions-apiserver v0.18.4/go.mod h1:NYeyeYq4SIpFlPxSAB6jHPIdvu3hL0pc36wuRChybio=
+k8s.io/apiextensions-apiserver v0.19.0-rc.4/go.mod h1:uKN7TEAym7OS0plm0zNxEE/NeTIzLCFEahIC3lC1HzQ=
 k8s.io/apimachinery v0.19.0-rc.4 h1:LVJnI5LJCzGHtGiL1ztkYEceAzatGPnnmUwxiLUx77E=
 k8s.io/apimachinery v0.19.0-rc.4/go.mod h1:oE8UQU9DqIIc9PyIEYxTj/oJECzZLymCEU9dL0H4F+o=
 k8s.io/apiserver v0.19.0-rc.4/go.mod h1:0cfEqMQGjl0GpzK+o9yHgzdcCU8kW/wy+JuSGo3Zl68=

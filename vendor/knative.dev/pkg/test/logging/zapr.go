@@ -18,8 +18,12 @@
 
 package logging
 
+import "github.com/go-logr/logr"
+
 // noopInfoLogger is a logr.InfoLogger that's always disabled, and does nothing.
-type noopInfoLogger struct{}
+type noopInfoLogger struct {
+	logr.Logger
+}
 
 func (l *noopInfoLogger) Enabled() bool                   { return false }
 func (l *noopInfoLogger) Info(_ string, _ ...interface{}) {}
@@ -29,6 +33,8 @@ var disabledInfoLogger = &noopInfoLogger{}
 // infoLogger is a logr.InfoLogger that uses Zap to log at a particular
 // level.
 type infoLogger struct {
+	logr.Logger
+
 	logrLevel int
 	t         *TLogger
 }

@@ -17,6 +17,7 @@ limitations under the License.
 package duck
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 	"time"
@@ -48,14 +49,20 @@ var _ InformerFactory = (*TypedInformerFactory)(nil)
 func (dif *TypedInformerFactory) Get(gvr schema.GroupVersionResource) (cache.SharedIndexInformer, cache.GenericLister, error) {
 	// Avoid error cases, like the GVR does not exist.
 	// It is not a full check. Some RBACs might sneak by, but the window is very small.
-	if _, err := dif.Client.Resource(gvr).List(metav1.ListOptions{}); err != nil {
+	if _, err := dif.Client.Resource(gvr).List(context.TODO(), metav1.ListOptions{}); err != nil {
 		return nil, nil, err
+	}
+
+	wrapWatch := func(f func(ctx context.Context, opts metav1.ListOptions) (watch.Interface, error)) cache.WatchFunc {
+		return func(opts metav1.ListOptions) (watch.Interface, error) {
+			return f(context.TODO(), opts)
+		}
 	}
 
 	listObj := dif.Type.GetListType()
 	lw := &cache.ListWatch{
 		ListFunc:  asStructuredLister(dif.Client.Resource(gvr).List, listObj),
-		WatchFunc: AsStructuredWatcher(dif.Client.Resource(gvr).Watch, dif.Type),
+		WatchFunc: AsStructuredWatcher(wrapWatch(dif.Client.Resource(gvr).Watch), dif.Type),
 	}
 	inf := cache.NewSharedIndexInformer(lw, dif.Type, dif.ResyncPeriod, cache.Indexers{
 		cache.NamespaceIndex: cache.MetaNamespaceIndexFunc,
@@ -72,11 +79,11 @@ func (dif *TypedInformerFactory) Get(gvr schema.GroupVersionResource) (cache.Sha
 	return inf, lister, nil
 }
 
-type unstructuredLister func(metav1.ListOptions) (*unstructured.UnstructuredList, error)
+type unstructuredLister func(context.Context, metav1.ListOptions) (*unstructured.UnstructuredList, error)
 
 func asStructuredLister(ulist unstructuredLister, listObj runtime.Object) cache.ListFunc {
 	return func(opts metav1.ListOptions) (runtime.Object, error) {
-		ul, err := ulist(opts)
+		ul, err := ulist(context.TODO(), opts)
 		if err != nil {
 			return nil, err
 		}

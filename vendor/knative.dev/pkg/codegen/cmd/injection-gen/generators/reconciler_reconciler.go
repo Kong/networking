@@ -508,7 +508,7 @@ func (r *reconcilerImpl) updateStatus(ctx {{.contextContext|raw}}, existing *{{.
 			{{else}}
 			getter := r.Client.{{.group}}{{.version}}().{{.type|apiGroup}}(desired.Namespace)
 			{{end}}
-			existing, err = getter.Get(desired.Name, {{.metav1GetOptions|raw}}{})
+			existing, err = getter.Get(ctx, desired.Name, {{.metav1GetOptions|raw}}{})
 			if err != nil {
 				return err
 			}
@@ -530,7 +530,7 @@ func (r *reconcilerImpl) updateStatus(ctx {{.contextContext|raw}}, existing *{{.
 		{{else}}
 		updater := r.Client.{{.group}}{{.version}}().{{.type|apiGroup}}(existing.Namespace)
 		{{end}}
-		_, err = updater.UpdateStatus(existing)
+		_, err = updater.UpdateStatus(ctx, existing, metav1.UpdateOptions{})
 		return err
 	})
 }
@@ -595,7 +595,7 @@ func (r *reconcilerImpl) updateFinalizersFiltered(ctx {{.contextContext|raw}}, r
 	patcher := r.Client.{{.group}}{{.version}}().{{.type|apiGroup}}(resource.Namespace)
 	{{end}}
 	resourceName := resource.Name
-	resource, err = patcher.Patch(resourceName, {{.typesMergePatchType|raw}}, patch)
+	resource, err = patcher.Patch(ctx, resourceName, {{.typesMergePatchType|raw}}, patch, metav1.PatchOptions{})
 	if err != nil {
 		r.Recorder.Eventf(resource, {{.corev1EventTypeWarning|raw}}, "FinalizerUpdateFailed",
 			"Failed to update finalizers for %q: %v", resourceName, err)

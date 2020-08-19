@@ -33,4 +33,6 @@ replace (
 	k8s.io/apiserver => k8s.io/apiserver v0.19.0-rc.4
 	k8s.io/client-go => k8s.io/client-go v0.19.0-rc.4
 	k8s.io/code-generator => k8s.io/code-generator v0.19.0-rc.4
+
+	knative.dev/pkg => github.com/mflendrich/pkg v0.0.0-20200818133434-fa27c4a25760
 )
