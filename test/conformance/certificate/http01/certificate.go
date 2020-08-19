@@ -17,6 +17,7 @@ limitations under the License.
 package http01
 
 import (
+	"context"
 	"testing"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -46,7 +47,7 @@ func TestHTTP01Challenge(t *testing.T) {
 			t.Fatal("failed to wait for HTTP01 challenges:", err)
 		}
 
-		cert, err := clients.NetworkingClient.Certificates.Get(cert.Name, metav1.GetOptions{})
+		cert, err := clients.NetworkingClient.Certificates.Get(context.TODO(), cert.Name, metav1.GetOptions{})
 		if err != nil {
 			t.Fatal("failed to fetch certificate:", err)
 		}

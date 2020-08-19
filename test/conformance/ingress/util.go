@@ -534,17 +534,17 @@ func createService(t *testing.T, clients *test.Clients, svc *corev1.Service) con
 	t.Helper()
 
 	t.Cleanup(func() {
-		clients.KubeClient.Kube.CoreV1().Services(svc.Namespace).Delete(svc.Name, &metav1.DeleteOptions{})
+		clients.KubeClient.Kube.CoreV1().Services(svc.Namespace).Delete(context.TODO(), svc.Name, metav1.DeleteOptions{})
 	})
 	if err := reconciler.RetryUpdateConflicts(func(attempts int) error {
-		_, err := clients.KubeClient.Kube.CoreV1().Services(svc.Namespace).Create(svc)
+		_, err := clients.KubeClient.Kube.CoreV1().Services(svc.Namespace).Create(context.TODO(), svc, metav1.CreateOptions{})
 		return err
 	}); err != nil {
 		t.Fatal("Error creating Service:", err)
 	}
 
 	return func() {
-		err := clients.KubeClient.Kube.CoreV1().Services(svc.Namespace).Delete(svc.Name, &metav1.DeleteOptions{})
+		err := clients.KubeClient.Kube.CoreV1().Services(svc.Namespace).Delete(context.TODO(), svc.Name, metav1.DeleteOptions{})
 		if err != nil {
 			t.Errorf("Error cleaning up Service %s: %v", svc.Name, err)
 		}
@@ -556,19 +556,21 @@ func createService(t *testing.T, clients *test.Clients, svc *corev1.Service) con
 func createPodAndService(t *testing.T, clients *test.Clients, pod *corev1.Pod, svc *corev1.Service) context.CancelFunc {
 	t.Helper()
 
-	t.Cleanup(func() { clients.KubeClient.Kube.CoreV1().Pods(pod.Namespace).Delete(pod.Name, &metav1.DeleteOptions{}) })
+	t.Cleanup(func() {
+		clients.KubeClient.Kube.CoreV1().Pods(pod.Namespace).Delete(context.TODO(), pod.Name, metav1.DeleteOptions{})
+	})
 	if err := reconciler.RetryUpdateConflicts(func(attempts int) error {
-		_, err := clients.KubeClient.Kube.CoreV1().Pods(pod.Namespace).Create(pod)
+		_, err := clients.KubeClient.Kube.CoreV1().Pods(pod.Namespace).Create(context.TODO(), pod, metav1.CreateOptions{})
 		return err
 	}); err != nil {
 		t.Fatal("Error creating Pod:", err)
 	}
 
 	t.Cleanup(func() {
-		clients.KubeClient.Kube.CoreV1().Services(svc.Namespace).Delete(svc.Name, &metav1.DeleteOptions{})
+		clients.KubeClient.Kube.CoreV1().Services(svc.Namespace).Delete(context.TODO(), svc.Name, metav1.DeleteOptions{})
 	})
 	if err := reconciler.RetryUpdateConflicts(func(attempts int) error {
-		_, err := clients.KubeClient.Kube.CoreV1().Services(svc.Namespace).Create(svc)
+		_, err := clients.KubeClient.Kube.CoreV1().Services(svc.Namespace).Create(context.TODO(), svc, metav1.CreateOptions{})
 		return err
 	}); err != nil {
 		t.Fatal("Error creating Service:", err)
@@ -576,7 +578,7 @@ func createPodAndService(t *testing.T, clients *test.Clients, pod *corev1.Pod, s
 
 	// Wait for the Pod to show up in the Endpoints resource.
 	waitErr := wait.PollImmediate(test.PollInterval, test.PollTimeout, func() (bool, error) {
-		ep, err := clients.KubeClient.Kube.CoreV1().Endpoints(svc.Namespace).Get(svc.Name, metav1.GetOptions{})
+		ep, err := clients.KubeClient.Kube.CoreV1().Endpoints(svc.Namespace).Get(context.TODO(), svc.Name, metav1.GetOptions{})
 		if apierrs.IsNotFound(err) {
 			return false, nil
 		} else if err != nil {
@@ -594,11 +596,11 @@ func createPodAndService(t *testing.T, clients *test.Clients, pod *corev1.Pod, s
 	}
 
 	return func() {
-		err := clients.KubeClient.Kube.CoreV1().Services(svc.Namespace).Delete(svc.Name, &metav1.DeleteOptions{})
+		err := clients.KubeClient.Kube.CoreV1().Services(svc.Namespace).Delete(context.TODO(), svc.Name, metav1.DeleteOptions{})
 		if err != nil {
 			t.Errorf("Error cleaning up Service %s: %v", svc.Name, err)
 		}
-		err = clients.KubeClient.Kube.CoreV1().Pods(pod.Namespace).Delete(pod.Name, &metav1.DeleteOptions{})
+		err = clients.KubeClient.Kube.CoreV1().Pods(pod.Namespace).Delete(context.TODO(), pod.Name, metav1.DeleteOptions{})
 		if err != nil {
 			t.Errorf("Error cleaning up Pod %s", pod.Name)
 		}
@@ -622,16 +624,16 @@ func CreateIngress(t *testing.T, clients *test.Clients, spec v1alpha1.IngressSpe
 		},
 		Spec: spec,
 	}
-	t.Cleanup(func() { clients.NetworkingClient.Ingresses.Delete(ing.Name, &metav1.DeleteOptions{}) })
+	t.Cleanup(func() { clients.NetworkingClient.Ingresses.Delete(context.TODO(), ing.Name, metav1.DeleteOptions{}) })
 	if err := reconciler.RetryUpdateConflicts(func(attempts int) (err error) {
-		ing, err = clients.NetworkingClient.Ingresses.Create(ing)
+		ing, err = clients.NetworkingClient.Ingresses.Create(context.TODO(), ing, metav1.CreateOptions{})
 		return err
 	}); err != nil {
 		t.Fatal("Error creating Ingress:", err)
 	}
 
 	return ing, func() {
-		err := clients.NetworkingClient.Ingresses.Delete(ing.Name, &metav1.DeleteOptions{})
+		err := clients.NetworkingClient.Ingresses.Delete(context.TODO(), ing.Name, metav1.DeleteOptions{})
 		if err != nil {
 			t.Errorf("Error cleaning up Ingress %s: %v", ing.Name, err)
 		}
@@ -646,7 +648,7 @@ func CreateIngressReadyDialContext(t *testing.T, clients *test.Clients, spec v1a
 		cancel()
 		t.Fatal("Error waiting for ingress state:", err)
 	}
-	ing, err := clients.NetworkingClient.Ingresses.Get(ing.Name, metav1.GetOptions{})
+	ing, err := clients.NetworkingClient.Ingresses.Get(context.TODO(), ing.Name, metav1.GetOptions{})
 	if err != nil {
 		cancel()
 		t.Fatal("Error getting Ingress:", err)
@@ -687,13 +689,13 @@ func UpdateIngress(t *testing.T, clients *test.Clients, name string, spec v1alph
 	t.Helper()
 
 	if err := reconciler.RetryUpdateConflicts(func(attempts int) error {
-		ing, err := clients.NetworkingClient.Ingresses.Get(name, metav1.GetOptions{})
+		ing, err := clients.NetworkingClient.Ingresses.Get(context.TODO(), name, metav1.GetOptions{})
 		if err != nil {
 			return err
 		}
 
 		ing.Spec = spec
-		_, err = clients.NetworkingClient.Ingresses.Update(ing)
+		_, err = clients.NetworkingClient.Ingresses.Update(context.TODO(), ing, metav1.UpdateOptions{})
 		return err
 	}); err != nil {
 		t.Fatal("Error fetching and updating Ingress:", err)
@@ -790,13 +792,13 @@ func CreateTLSSecretWithCertPool(t *testing.T, clients *test.Clients, hosts []st
 		},
 	}
 	t.Cleanup(func() {
-		clients.KubeClient.Kube.CoreV1().Secrets(secret.Namespace).Delete(secret.Name, &metav1.DeleteOptions{})
+		clients.KubeClient.Kube.CoreV1().Secrets(secret.Namespace).Delete(context.TODO(), secret.Name, metav1.DeleteOptions{})
 	})
-	if _, err := clients.KubeClient.Kube.CoreV1().Secrets(secret.Namespace).Create(secret); err != nil {
+	if _, err := clients.KubeClient.Kube.CoreV1().Secrets(secret.Namespace).Create(context.TODO(), secret, metav1.CreateOptions{}); err != nil {
 		t.Fatal("Error creating Secret:", err)
 	}
 	return name, func() {
-		err := clients.KubeClient.Kube.CoreV1().Secrets(secret.Namespace).Delete(secret.Name, &metav1.DeleteOptions{})
+		err := clients.KubeClient.Kube.CoreV1().Secrets(secret.Namespace).Delete(context.TODO(), secret.Name, metav1.DeleteOptions{})
 		if err != nil {
 			t.Errorf("Error cleaning up Secret %s: %v", secret.Name, err)
 		}
@@ -831,7 +833,7 @@ func CreateDialContext(t *testing.T, ing *v1alpha1.Ingress, clients *test.Client
 	}
 	name, namespace := parts[0], parts[1]
 
-	svc, err := clients.KubeClient.Kube.CoreV1().Services(namespace).Get(name, metav1.GetOptions{})
+	svc, err := clients.KubeClient.Kube.CoreV1().Services(namespace).Get(context.TODO(), name, metav1.GetOptions{})
 	if err != nil {
 		t.Fatalf("Unable to retrieve Kubernetes service %s/%s: %v", namespace, name, err)
 	}
@@ -962,7 +964,7 @@ func WaitForIngressState(client *test.NetworkingClients, name string, inState fu
 	var lastState *v1alpha1.Ingress
 	waitErr := wait.PollImmediate(test.PollInterval, test.PollTimeout, func() (bool, error) {
 		var err error
-		lastState, err = client.Ingresses.Get(name, metav1.GetOptions{})
+		lastState, err = client.Ingresses.Get(context.TODO(), name, metav1.GetOptions{})
 		if err != nil {
 			return true, err
 		}

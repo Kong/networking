@@ -89,7 +89,7 @@ func AddRootCAtoTransport(logf logging.FormatLogger, clients *Clients, https boo
 // PemDataFromSecret gets pem data from secret.
 func PemDataFromSecret(logf logging.FormatLogger, clients *Clients, ns, secretName string) []byte {
 	secret, err := clients.KubeClient.Kube.CoreV1().Secrets(ns).Get(
-		secretName, metav1.GetOptions{})
+		context.TODO(), secretName, metav1.GetOptions{})
 	if err != nil {
 		logf("Failed to get Secret %s: %v", secretName, err)
 		return []byte{}

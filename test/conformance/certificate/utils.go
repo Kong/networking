@@ -58,11 +58,11 @@ func CreateCertificate(t *testing.T, clients *test.Clients, dnsNames []string) *
 	}
 
 	test.EnsureCleanup(t, func() {
-		clients.NetworkingClient.Certificates.Delete(cert.Name, &metav1.DeleteOptions{})
-		clients.KubeClient.Kube.CoreV1().Secrets(test.ServingNamespace).Delete(cert.Spec.SecretName, &metav1.DeleteOptions{})
+		clients.NetworkingClient.Certificates.Delete(context.TODO(), cert.Name, metav1.DeleteOptions{})
+		clients.KubeClient.Kube.CoreV1().Secrets(test.ServingNamespace).Delete(context.TODO(), cert.Spec.SecretName, metav1.DeleteOptions{})
 	})
 
-	cert, err := clients.NetworkingClient.Certificates.Create(cert)
+	cert, err := clients.NetworkingClient.Certificates.Create(context.TODO(), cert, metav1.CreateOptions{})
 	if err != nil {
 		t.Fatal("Error creating Certificate:", err)
 	}
@@ -83,7 +83,7 @@ func WaitForCertificateSecret(t *testing.T, client *test.Clients, cert *v1alpha1
 	defer span.End()
 
 	return wait.PollImmediate(test.PollInterval, test.PollTimeout, func() (bool, error) {
-		secret, err := client.KubeClient.Kube.CoreV1().Secrets(test.ServingNamespace).Get(cert.Spec.SecretName, metav1.GetOptions{})
+		secret, err := client.KubeClient.Kube.CoreV1().Secrets(test.ServingNamespace).Get(context.TODO(), cert.Spec.SecretName, metav1.GetOptions{})
 
 		if apierrs.IsNotFound(err) {
 			return false, nil
@@ -122,7 +122,7 @@ func WaitForCertificateState(client *test.NetworkingClients, name string, inStat
 	var lastState *v1alpha1.Certificate
 	return wait.PollImmediate(test.PollInterval, test.PollTimeout, func() (bool, error) {
 		var err error
-		lastState, err = client.Certificates.Get(name, metav1.GetOptions{})
+		lastState, err = client.Certificates.Get(context.TODO(), name, metav1.GetOptions{})
 		if err != nil {
 			return true, err
 		}
@@ -145,7 +145,7 @@ func VerifyChallenges(t *testing.T, client *test.Clients, cert *v1alpha1.Certifi
 		if !certDomains.Has(challenge.URL.Host) {
 			t.Errorf("HTTP01 Challenge host %s is not one of: %v", challenge.URL.Host, cert.Spec.DNSNames)
 		}
-		_, err := client.KubeClient.Kube.CoreV1().Services(challenge.ServiceNamespace).Get(challenge.ServiceName, metav1.GetOptions{})
+		_, err := client.KubeClient.Kube.CoreV1().Services(challenge.ServiceNamespace).Get(context.TODO(), challenge.ServiceName, metav1.GetOptions{})
 		if apierrs.IsNotFound(err) {
 			t.Errorf("failed to find solver service for challenge: %v", err)
 		}
