@@ -28,11 +28,11 @@ replace (
 	github.com/prometheus/client_golang => github.com/prometheus/client_golang v0.9.2
 	github.com/tsenart/vegeta => github.com/tsenart/vegeta v1.2.1-0.20190917092155-ab06ddb56e2f
 
-	k8s.io/api => k8s.io/api v0.19.0-rc.4
-	k8s.io/apimachinery => k8s.io/apimachinery v0.19.0-rc.4
-	k8s.io/apiserver => k8s.io/apiserver v0.19.0-rc.4
-	k8s.io/client-go => k8s.io/client-go v0.19.0-rc.4
-	k8s.io/code-generator => k8s.io/code-generator v0.19.0-rc.4
+	k8s.io/api => k8s.io/api v0.18.8
+	k8s.io/apimachinery => k8s.io/apimachinery v0.18.8
+	k8s.io/apiserver => k8s.io/apiserver v0.18.8
+	k8s.io/client-go => k8s.io/client-go v0.18.8
+	k8s.io/code-generator => k8s.io/code-generator v0.18.8
 
-	knative.dev/pkg => github.com/mflendrich/pkg v0.0.0-20200818133434-fa27c4a25760
+	knative.dev/pkg => github.com/mflendrich/pkg v0.0.0-20200820125340-3493cae5c655
 )
